@@ -5,8 +5,22 @@ const User = require("../models/User");
 
 const normalizeImage = (outfitDoc) => {
   const doc = outfitDoc.toObject ? outfitDoc.toObject() : outfitDoc;
+
+  const titleCase = (str) =>
+    String(str || "")
+      .toLowerCase()
+      .replace(/\b([a-z])/g, (m) => m.toUpperCase());
+
+  const derivedName = (() => {
+    const type = (doc.type || "").trim();
+    const brand = (doc.brand || "").trim();
+    const base = [type, brand].filter(Boolean).join(" - ");
+    return titleCase(base);
+  })();
+
   return {
     ...doc,
+    name: (doc.name && String(doc.name).trim()) ? doc.name : derivedName,
     image: doc.imageUrl || doc.image || "",
   };
 };

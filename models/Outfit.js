@@ -2,6 +2,12 @@ const mongoose = require('mongoose');
 
 const outfitSchema = new mongoose.Schema(
   {
+      name: {
+      type: String,
+      required: true,
+      trim: true,
+      index: true,
+    },
     type: {
       type: String,
       required: true,
@@ -32,6 +38,11 @@ const outfitSchema = new mongoose.Schema(
       required: true,
       trim: true,
       index: true,
+    },
+    price: {
+      type: Number,
+      default: null,
+      min: 0,
     },
     color: {
      type: [String],

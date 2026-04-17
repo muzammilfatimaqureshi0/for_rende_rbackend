@@ -732,7 +732,7 @@ app.get("/get-tryons/:userId", async (req, res) => {
   }
 });
 
-// GET /outfits/filter — supports gender, category, type, color
+// GET /outfits/filter — supports gender, category, type, color, minPrice, maxPrice
 app.get('/outfits/filter', async (req, res) => {
   try {
     const rawGender = String(req.query.gender || '').trim();
@@ -745,10 +745,15 @@ app.get('/outfits/filter', async (req, res) => {
     const category = String(req.query.category || '').trim();
     const type     = String(req.query.type     || '').trim();
     const color    = String(req.query.color    || '').trim();
+    const minPrice = parseInt(req.query.minPrice) || 0;
+    const maxPrice = parseInt(req.query.maxPrice) || 30000;
 
     if (category) query.category = category;
     if (type)     query.type     = type;
     if (color)    query.color    = { $in: [color] };
+
+    // Add price range filter
+    query.price = { $gte: minPrice, $lte: maxPrice };
 
     const page  = parseInt(req.query.page)  || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -852,7 +857,7 @@ app.get('/brand-filter/options', async (req, res) => {
   }
 });
 
-// GET /brand-filter/outfits — outfits for a brand with optional gender/category/type/color
+// GET /brand-filter/outfits — outfits for a brand with optional gender/category/type/color/price
 app.get('/brand-filter/outfits', async (req, res) => {
   try {
     const brand = String(req.query.brand || '').trim();
@@ -869,10 +874,15 @@ app.get('/brand-filter/outfits', async (req, res) => {
     const category = String(req.query.category || '').trim();
     const type     = String(req.query.type     || '').trim();
     const color    = String(req.query.color    || '').trim();
+    const minPrice = parseInt(req.query.minPrice) || 0;
+    const maxPrice = parseInt(req.query.maxPrice) || 30000;
 
     if (category) query.category = category;
     if (type)     query.type     = type;
     if (color)    query.color    = { $in: [color] };
+
+    // Add price range filter
+    query.price = { $gte: minPrice, $lte: maxPrice };
 
     const page  = parseInt(req.query.page)  || 1;
     const limit = parseInt(req.query.limit) || 10;
