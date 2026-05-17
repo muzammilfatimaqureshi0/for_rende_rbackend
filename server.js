@@ -327,10 +327,28 @@ app.post("/create-post", upload.single("image"), async (req, res) => {
     // ✅ Store only relative path in DB
     const imageUrl = `/uploads/${req.file.filename}`;
 
+    // ✅ Parse outfit metadata from request body
+    let outfitData = null;
+    if (req.body.outfitMeta) {
+      try {
+        outfitData = JSON.parse(req.body.outfitMeta);
+      } catch (e) {
+        console.log("Could not parse outfit metadata");
+      }
+    }
+
     const newPost = await Post.create({
       user: req.body.userId,
       image: imageUrl,
       caption: req.body.caption,
+      outfit: outfitData ? {
+        id: outfitData._id,
+        url: outfitData.url,
+        name: outfitData.name,
+        brand: outfitData.brand,
+        price: outfitData.price,
+        image: outfitData.image || outfitData.imageUrl,
+      } : null,
     });
 
     const populatedPost = await newPost.populate(
@@ -346,7 +364,8 @@ app.post("/create-post", upload.single("image"), async (req, res) => {
     }
 
     res.status(201).json(postObj);
-  } catch {
+  } catch (error) {
+    console.log("Create post error:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
